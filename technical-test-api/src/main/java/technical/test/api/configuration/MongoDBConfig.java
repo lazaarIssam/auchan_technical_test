@@ -2,18 +2,18 @@ package technical.test.api.configuration;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+import com.mongodb.reactivestreams.client.MongoClient;
+import com.mongodb.reactivestreams.client.MongoClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
 
-@EnableMongoRepositories
 @Configuration
-public class MongoDBConfig {
+@EnableReactiveMongoRepositories
+public class MongoDBConfig{
 
     @Value("mongodb+srv://issamlazaar:7IFtqWDr1cU5rTqf@cluster0.a9tdxox.mongodb.net")
     private String mongoUri;
@@ -30,7 +30,7 @@ public class MongoDBConfig {
     }
 
     @Bean
-    public MongoTemplate mongoTemplate() {
-        return new MongoTemplate(mongoClient(), databaseName);
+    public ReactiveMongoTemplate reactiveMongoTemplate(){
+        return new ReactiveMongoTemplate(mongoClient(), databaseName);
     }
 }

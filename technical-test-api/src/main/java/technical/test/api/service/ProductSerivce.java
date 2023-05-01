@@ -1,13 +1,13 @@
 package technical.test.api.service;
 
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import technical.test.api.model.Product;
 import technical.test.api.repository.ProductRepo;
 
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductSerivce {
@@ -17,56 +17,40 @@ public class ProductSerivce {
     private ProductRepo productRepo;
 
     // fucntion to list all the products from the db
-    public List<Product> getAllProducts (){
+    public Flux<Product> getAllProducts (){
         return productRepo.findAll();
     }
 
     // function to create a product
-    public String createProduct (Product product) throws IllegalArgumentException {
+    public Mono<String> createProduct (Product product) throws IllegalArgumentException {
         if (product == null || product.getName() == null || product.getName().isEmpty()) {
             // throw error 301 => empty field(s)
             throw new IllegalArgumentException("301");
         }
 
-        try{
-            productRepo.save(product);
-            return "200";
-        }catch (Exception e){
-            return "Failed to create product: " + e.getMessage();
-        }
+        return productRepo.save(product).thenReturn("200").onErrorResume(e -> Mono.just("Failed to create a product "+e.getMessage()));
     }
 
     // function to update a product
-    public String updateProduct (Product product){
-        try {
-            Optional<Product> optionalProduct = productRepo.findById(product.get_id());
-            //Optional<Product> optionalProduct = productRepo.findProductByNumserie(product.getNumserie());
-            if(optionalProduct.isPresent()){
-                Product productToUpdate = optionalProduct.get();
-                productToUpdate.setName(product.getName());
-                productToUpdate.setNumserie(product.getNumserie());
-                productToUpdate.setPrice(product.getPrice());
-                productToUpdate.setType(product.getType());
-                productRepo.save(productToUpdate);
-                return "200";
-            }
-            return "Product no found";
-        } catch (Exception e) {
-            return "Failed to update product: " + e.getMessage();
-        }
+    public Mono<String> updateProduct (Product product){
+        return productRepo.findById(product.get_id()).flatMap(existingProduct ->{
+            existingProduct.setName(product.getName());
+            existingProduct.setNumserie(product.getNumserie());
+            existingProduct.setPrice(product.getPrice());
+            existingProduct.setType(product.getType());
+            return productRepo.save(existingProduct);
+        })
+                .map(updatedProduct -> "200")
+                .switchIfEmpty(Mono.just("Product not found"))
+                .onErrorResume(error -> Mono.just("Failed to update product: " + error.getMessage()));
     }
 
     // function to delete a product using the id
-    public String deleteProduct (Product product){
-        try{
-            Optional<Product> optionalProduct = productRepo.findById(product.get_id());
-            if(optionalProduct.isPresent()){
-                productRepo.deleteById(product.get_id());
-                return "200";
-            }
-            return "Product no found";
-        }catch (Exception e){
-            return "Product not found "+e.getMessage();
-        }
+    public Mono<String> deleteProduct(Product product) {
+        return productRepo.findById(product.get_id())
+                .flatMap(existingProduct -> productRepo.delete(existingProduct)
+                        .thenReturn("200"))
+                .switchIfEmpty(Mono.just("Product not found"))
+                .onErrorResume(error -> Mono.just("Failed to delete product " + error.getMessage()));
     }
  }
