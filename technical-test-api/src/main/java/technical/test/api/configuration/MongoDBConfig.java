@@ -16,9 +16,11 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 public class MongoDBConfig{
 
     @Value("mongodb+srv://issamlazaar:7IFtqWDr1cU5rTqf@cluster0.a9tdxox.mongodb.net")
+    //@Value("${mongo-url}")
     private String mongoUri;
 
     @Value("auchan_db")
+    //@Value("${database}")
     private String databaseName;
 
     @Bean

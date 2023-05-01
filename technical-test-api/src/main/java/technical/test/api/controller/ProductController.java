@@ -1,6 +1,5 @@
 package technical.test.api.controller;
 
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +11,7 @@ import technical.test.api.model.Product;
 import technical.test.api.service.ProductSerivce;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/products")
 public class ProductController {
 
