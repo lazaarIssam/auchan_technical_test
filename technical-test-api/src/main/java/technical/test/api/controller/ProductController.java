@@ -1,6 +1,5 @@
 package technical.test.api.controller;
 
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,7 @@ import technical.test.api.service.ProductSerivce;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/products")
 public class ProductController {
 
@@ -34,7 +34,7 @@ public class ProductController {
             productSerivce.createProduct(product);
             return new ResponseEntity("200",HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity(e.getMessage().toString(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -44,7 +44,7 @@ public class ProductController {
             String value = productSerivce.updateProduct(product);
             return new ResponseEntity(value,HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity(e.getMessage().toString(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -55,7 +55,7 @@ public class ProductController {
             String value = productSerivce.deleteProduct(product);
             return new ResponseEntity(value,HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity(e.getMessage().toString(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 }
